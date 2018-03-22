@@ -8,7 +8,7 @@ tasks:
   build:
     cmds:
       - docker version
-      - docker build --build-arg NGINX_GPG_KEY={{.NGINX_GPG_KEY}} --build-arg NGINX_VERSION={{.NGINX_VERSION}} -t $REPO:$TAG .
+      - docker build --compress --build-arg NGINX_GPG_KEY={{.NGINX_GPG_KEY}} --build-arg NGINX_VERSION={{.NGINX_VERSION}} -t $REPO:$TAG .
   push:
     cmds:
       - docker login -u $DOCKER_USER -p $DOCKER_PASS

@@ -11,16 +11,16 @@ fi
 
 # Display PHP error's or not
 if [[ "$ERRORS" != "1" ]] ; then
- echo php_flag[display_errors] = off >> /usr/local/etc/php-fpm.conf
+ echo php_flag[display_errors] = off >> /etc/php7/php-fpm.conf
 else
- echo php_flag[display_errors] = on >> /usr/local/etc/php-fpm.conf
+ echo php_flag[display_errors] = on >> /etc/php7/php-fpm.conf
 fi
 
 # Display Version Details or not
 if [[ "$HIDE_NGINX_HEADERS" == "0" ]] ; then
  sed -i "s/server_tokens off;/server_tokens on;/g" /etc/nginx/nginx.conf
 else
- sed -i "s/expose_php = On/expose_php = Off/g" /usr/local/etc/php-fpm.conf
+ sed -i "s/expose_php = On/expose_php = Off/g" /etc/php7/php-fpm.conf
 fi
 
 # Pass real-ip to logs when behind ELB, etc
