@@ -1,14 +1,21 @@
-FROM alpine:3.6
+FROM alpine:3.7
 
-MAINTAINER Sebastian Döll <sebastian@katallaxie.me>
+# Arguments
+ARG NGINX_VERSION
+ARG NGINX_GPG_KEY
+
+# Labels
+LABEL MAINTAINER Sebastian Döll <sebastian.doell@spring-media.de>
+
+# Environment
+ENV NGINX_VERSION ${NGINX_VERSION:-1.3.10}
+ENV NGINX_GPG_KEY ${NGINX_GPG_KEY:-B0F4253373F8F6F510D42178520A9993A1C052F8}
 
 ENV php_conf /etc/php7/php-fpm.conf
 ENV fpm_conf /etc/php7/php-fpm.d/www.conf
 ENV php_vars /etc/php7/php.ini
 
-ENV NGINX_VERSION 1.13.1
-
-RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
+RUN GPG_KEY=${NGINX_GPG_KEY} \
   && CONFIG="\
     --prefix=/etc/nginx \
     --sbin-path=/usr/sbin/nginx \
@@ -77,7 +84,7 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
   && curl -fSL http://nginx.org/download/nginx-$NGINX_VERSION.tar.gz -o nginx.tar.gz \
   && curl -fSL http://nginx.org/download/nginx-$NGINX_VERSION.tar.gz.asc -o nginx.tar.gz.asc \
   && export GNUPGHOME="$(mktemp -d)" \
-  && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$GPG_KEYS" \
+  && gpg --keyserver hkp://ipv4.pool.sks-keyservers.net:80 --recv-keys "$GPG_KEY" \
   && gpg --batch --verify nginx.tar.gz.asc nginx.tar.gz \
   && rm -r "$GNUPGHOME" nginx.tar.gz.asc \
   && mkdir -p /usr/src \

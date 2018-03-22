@@ -1,17 +1,5 @@
 #!/bin/bash
 
-# Set custom webroot
-if [ ! -z "$WEBROOT" ]; then
- sed -i "s#root /var/www/html;#root ${WEBROOT};#g" /etc/nginx/sites-available/default.conf
-else
- webroot=/var/www/html
-fi
-
-# Try auto install for composer
-if [ -f "/var/www/html/composer.lock" ]; then
-  composer install --no-dev --working-dir=/var/www/html
-fi
-
 # Enable custom nginx config files if they exist
 if [ -f /var/www/html/conf/nginx/nginx-site.conf ]; then
   cp /var/www/html/conf/nginx/nginx-site.conf /etc/nginx/sites-available/default.conf
@@ -67,30 +55,6 @@ fi
 # Increase the upload_max_filesize
 if [ ! -z "$PHP_UPLOAD_MAX_FILESIZE" ]; then
  sed -i "s/upload_max_filesize = 100M/upload_max_filesize= ${PHP_UPLOAD_MAX_FILESIZE}M/g" /usr/local/etc/php/conf.d/docker-vars.ini
-fi
-
-if [ ! -z "$PUID" ]; then
-  if [ -z "$PGID" ]; then
-    PGID=${PUID}
-  fi
-  deluser nginx
-  addgroup -g ${PGID} nginx
-  adduser -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx -u ${PUID} nginx
-else
-  # Always chown webroot for better mounting
-  chown -Rf nginx.nginx /var/www/html
-fi
-
-# Run custom scripts
-if [[ "$RUN_SCRIPTS" == "1" ]] ; then
-  if [ -d "/var/www/html/scripts/" ]; then
-    # make scripts executable incase they aren't
-    chmod -Rf 750 /var/www/html/scripts/*
-    # run scripts in number order
-    for i in `ls /var/www/html/scripts/`; do /var/www/html/scripts/$i ; done
-  else
-    echo "Can't find script directory"
-  fi
 fi
 
 # Start supervisord and services

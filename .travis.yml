@@ -1,19 +1,42 @@
-language: python
-python:
-  - 2.7
+language: go
+go:
+  - 1.8
+
+cache:
+  directories:
+  - "$GOPATH/src"
+  - "$GOPATH/pkg"
 
 services:
   - docker
 
-install:
-  - docker build -t php .
-  - docker run -d -p 127.0.0.1:80:80 --name php-fpm-nginx php
+before_install:
+  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+  - export REPO=${TRAVIS_REPO_SLUG}
 
-before_script:
-  - pip install -r .travis/requirements.txt
+install:
+  # Install go-task
+  - go get -u -v github.com/go-task/task/cmd/task
 
 script:
-  - docker ps
-  - sleep 5
-  - curl -I 127.0.0.1:80
-  - python .travis/tests.py
+  # Run build
+  - task build
+
+after_success:
+  # Push docker
+  - task push
+
+env:
+  global:
+    # DOCKER_EMAIL
+    - secure: F9ups+xyLUzXAFohUuaHGFwbbXFb4zDd86Xk+zUHd+qXdFsYluRlu+T7WEYsDCk0VtnObatkdLkvyQPNraW9TsIkOja5GXSNccnqT9lH52Gifmlk+5313FE2XPEOt+IKXYr6mMRCWmevmU1vzT3BEPNUMMmMvTiRI8+p5jaYKIwbSAZQ8wdWJ0LR8LSQ+qapfeMHE2PQSV+A7sviKuV1ONCT4GIXujyK2rP45iefBC7HXcky3QDd+LkS7A9wkZ+TUqyR8AHPaiW6BXseejt5zLTDeWnWTm8axs70uGhV1hvsdbwqJ7/B8/4SzdqZC/dVQT4rPzqyjnIr8Lh382HR2DNeLVp/+mDBRQgpN3gl+vDkMangMlvdD0G/zEZCk0j47+OscmAypKygsYmhVrDPAy06wsTXRNyymw29NpgRwCVczgbt+VJYUg4sUeYP0T6CujDaMrh6dOJD2nJZ87FkYWqFC9q5fGESf/AkmwvZZB97b5ollvHX1hxAcq6jLcOJ4RWjUWgPgKZFvObV5m6UPNDehD60+MJcAhrsVsRjO05tOXoPdptjJwVasrgiMBlZEuCaSP1NX0p+Nw6FlXKUbDfd+nV2A8NLg6BQaWyuELieVHTGDQf1DS0YtsZPgHSMOaFkLXjR3fo2ZlQPRb8lEJHMYiy0BFRR/Ay1JrXzaWs=
+    # DOCKER_USER
+    - secure: sqsBUjGKCQhGU46oz65nOhqoVay+w124T0+OrKiIrwYXTP9yoc21Q6lARg8ytWW8MRmyris6oHupHJjLPWADdYvfNnDlnTveK7sfSv+xuTFtPDZnb7KFTwhozAHMTNtQ0NZ2wMxkLo45OU9SaW3NDWkLLOnBkH2YoJJa4mF8R5yWfSQS09Ovr2V8XiRqPzXOOpYVCjnen5GSsqhbRvAZE4LRzf7aUB2UKp8c2mC+RVSkSsWX4ReJ8LU1rndps61jEHHhNPGeeIIKiGtfQ/ooHRwzK3WcpUFEBT+9homSCsA3kZM2ENfyg+B7/1iNgOoc4g6UT+iTj1PXYnIojBwvKx7zv/nKznw5Bx1k2g96doytPsV7ZKYcBERvKcvfaIGqeb3V3tmhF/WvgKpHdw0loF6p1E3X/+M1vnKHdFweFQp0FheOLwvyWXXyx0TaWJRsMjxv0ARZLI5sdmU9QGxGfwB2Kz5vHZWrfTEGx96P73Ss//abU6Q3m1aKw3HsRKmL17q1YIG0x1r5x9w/Dqxdy5DiJDbL05TayLLIUxkWAq95JouARUv8D7fe+uQF987QnMnX3vvzJbIuB50/l98yxu+uwQ7LkzSNvrg9AcDABH43CqsKJbeGqMPQ7BIyZeNiUYreFlMZKu2ZxS3q2ivAtsuDsjtwmJakVQqJzmLSyhU=
+    # DOCKER_PASS
+    - secure: Nb6ZJrd/r93sSqrxAUn7J10GIlhAGH7IdXhr/Fedwp12c2veOIxb6jmPNz4duXnOeoWAiA6dLqpI52zr8/owoqrwdhVX3AgN/vKuiJjlyVsD81AJqvmx+sm3FnqKM9ruN6U/ZtnRxVqnQ2+Eaut8ksjNd/C0lo2hwcFwGjdRsZTVOlczfD+81u3CD1roo4UEPD8OIGKu5j/vviVMq5ZjWs9qrwaoc7xhDHZSQcUyfY++1Q5bsMF1+syN++ihuYlsioBAod0PEHtXEa4nDpvRV3h+aztiMtVpfbpYJVqOW/2ol5HqdLr/QEmZWdUXTasu1lRV4NEXv1/DAhND7tmEEvLUmwv4hdqXqDjRvaERnKpmQrc4oPu4YhS9Cc9rZug22dS65tiM2/oO6gldY3pdxnKiPlp2XOM+EFjKx83hDMt8aTG3YSesTVudqR+sMVRmpI1t1z9bMkEESNuID3E4UVxaA87smyV6pN4KUYtCwfrrdABws1oXeTxTP8RXXl/W857PnoAfENAYZueXksJ/tzkYqKEQV6+k1Wzt3gqQb4nitTnruWYLzX5m9dXcyNQ1ozOd2rAL/NP05Qh8+FFJslt04tBR2ramUonz064DftcY0de1ZBSv28BlUccqPyfmDZXn3IMK0HsFQPKJPq76qDtLmGq9svBwV21/YZTi+hI=
+    # Use last 8 characters of SHA
+    - COMMIT=${TRAVIS_COMMIT::8}
+
+notifications:
+  slack:
+    secure: CAngHphRbULcCkSO1O0se43HJnvkYTU9Xt4IAQ40j2yZBXWc+abJw2skM0MGBoqKQ7KplvdRFnRhvDAVp717e4EqFM9ljgMVeMgP5DyJVt/Ru3u1ZsPD5LL0uzzc7+S3jbNgHSi+M9lE/XncrI5AuIR1ooUbPyGkta7nRwdpSK7benAwzqSAwDzwKeloJz8O4aPbao4IwOq+AjiV+jMKMUMhN5KYGxJje0+KrZhc1jqFEuncWjrvTiLug0ZNNsbofBzcmfJQ0YeHbMQH9Ha7Jm7AYZwkJksZHHglCjcgPCk3N2BGCqLCLZGDBX7NdcwnquG++eJh+9RxtnJ1niN3SEv+CBxfXf5TjEx1AQSdTMkljTnocBAFnTneXaSyhcpFjUjkbPdnomeExLzjKlWX7/WwA1JCYlOSrHhyzm6d8/PbP1ghrYlyIIIQgQ1kn74OMxyx2XF8PmztLIQwDVtYOFfYLnOsb8mrteWUWWuxjCc114QhVjfyDymHPspAZ8dvskZ+rxm7S38umkx1foSE6VWkWl7lpXl3JBQIm4A/+C+6svVMHmTN0QseibVxnSQtp7CK+nlKprZKali/cjbWLnmkDkyCpSefC0iYpWnVJ/w8QanMlzeSrKZgSDg3y3dUURi7mytaVZXh8TPNcj6GuMYfTgDDaDifvA6fdDJNTqc=

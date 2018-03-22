@@ -1,0 +1,15 @@
+version: '2'
+
+vars:
+  NGINX_GPG_KEY: B0F4253373F8F6F510D42178520A9993A1C052F8
+  NGINX_VERSION: 1.13.10
+
+tasks:
+  build:
+    cmds:
+      - docker version
+      - docker build --build-arg NGINX_GPG_KEY={{.NGINX_GPG_KEY}} --build-arg NGINX_VERSION={{.NGINX_VERSION}} -t $REPO:$TAG .
+  push:
+    cmds:
+      - docker login -u $DOCKER_USER -p $DOCKER_PASS
+      - docker push $REPO:$TAG
