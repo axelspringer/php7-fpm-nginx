@@ -144,6 +144,7 @@ RUN GPG_KEY=${NGINX_GPG_KEY} \
 
 RUN apk add --no-cache \
     supervisor \
+    bash \
 		php7-bcmath \
 		php7-bz2 \
 		php7-ctype \
