@@ -8,7 +8,7 @@ ARG NGINX_GPG_KEY
 LABEL MAINTAINER Sebastian Döll <sebastian.doell@spring-media.de>
 
 # Environment
-ENV NGINX_VERSION ${NGINX_VERSION:-1.3.10}
+ENV NGINX_VERSION ${NGINX_VERSION:-1.12.2}
 ENV NGINX_GPG_KEY ${NGINX_GPG_KEY:-B0F4253373F8F6F510D42178520A9993A1C052F8}
 
 ENV php_conf /etc/php7/php-fpm.conf
@@ -213,7 +213,6 @@ RUN echo "cgi.fix_sthinfo=0" > ${php_vars} &&\
         ${fpm_conf}
 #    ln -s /etc/php7/php.ini /etc/php7/conf.d/php.ini && \
 #    find /etc/php7/conf.d/ -name "*.ini" -exec sed -i -re 's/^(\s*)#(.*)/\1;\2/g' {} \;
-
 
 # Add Scripts
 ADD scripts/start.sh /start.sh
