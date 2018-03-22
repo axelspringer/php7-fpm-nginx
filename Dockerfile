@@ -144,7 +144,6 @@ RUN GPG_KEY=${NGINX_GPG_KEY} \
 
 RUN apk add --no-cache \
     supervisor \
-    php7 \
 		php7-bcmath \
 		php7-bz2 \
 		php7-ctype \
@@ -159,7 +158,6 @@ RUN apk add --no-cache \
 		php7-intl \
 		php7-json \
 		php7-mbstring \
-		php7-mcrypt \
 		php7-memcached \
 		php7-mysqli \
 		php7-odbc \
@@ -173,7 +171,6 @@ RUN apk add --no-cache \
 		php7-phar \
 		php7-session \
 		php7-simplexml \
-		php7-soap \
 		php7-sqlite3 \
 		php7-tokenizer \
 		php7-xml \
@@ -183,7 +180,8 @@ RUN apk add --no-cache \
 		php7-xsl \
 		php7-zip \
 		php7-zlib \
-    php7-mcrypt \
+    php7 \
+    php7-mcrypt && \
     mkdir -p /etc/nginx && \
     mkdir -p /var/www/app && \
     mkdir -p /run/nginx && \
