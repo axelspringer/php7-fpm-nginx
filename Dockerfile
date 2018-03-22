@@ -233,8 +233,6 @@ RUN chmod 755 /start.sh
 # copy in code
 ADD src/ /var/www/html/
 
-VOLUME /var/www/html
-
 EXPOSE 443 80
 
 CMD ["/start.sh"]
