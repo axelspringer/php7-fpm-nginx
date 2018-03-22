@@ -153,7 +153,6 @@ RUN apk add --no-cache \
 		php7-exif \
 		php7-fpm \
 		php7-gd \
-		php7-gd \
 		php7-gettext \
 		php7-gmp \
 		php7-iconv \
