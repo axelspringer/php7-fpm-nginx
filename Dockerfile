@@ -10,6 +10,12 @@ LABEL MAINTAINER Sebastian Döll <sebastian.doell@spring-media.de>
 # Environment
 ENV NGINX_VERSION ${NGINX_VERSION:-1.12.2}
 ENV NGINX_GPG_KEY ${NGINX_GPG_KEY:-B0F4253373F8F6F510D42178520A9993A1C052F8}
+ENV DEVEL_KIT_MODULE_VERSION 0.3.0
+ENV LUA_MODULE_VERSION 0.10.13
+ENV SET_MISC_VERSION 0.32
+
+ENV LUAJIT_LIB=/usr/lib
+ENV LUAJIT_INC=/usr/include/luajit-2.1
 
 ENV php_conf /etc/php7/php-fpm.conf
 ENV fpm_conf /etc/php7/php-fpm.d/www.conf
@@ -62,6 +68,9 @@ RUN GPG_KEY=${NGINX_GPG_KEY} \
     --with-ipv6 \
     --with-http_v2_module \
     --add-module=/usr/src/ngx_brotli \
+    --add-module=/usr/src/ngx_devel_kit-$DEVEL_KIT_MODULE_VERSION \
+    --add-module=/usr/src/lua-nginx-module-$LUA_MODULE_VERSION \
+    --add-module=/usr/src/set-misc-nginx-module-$SET_MISC_VERSION \
   " \
   && addgroup -S nginx \
   && adduser -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx nginx \
@@ -81,15 +90,22 @@ RUN GPG_KEY=${NGINX_GPG_KEY} \
     libxslt-dev \
     gd-dev \
     geoip-dev \
+    luajit-dev \
   && curl -fSL http://nginx.org/download/nginx-$NGINX_VERSION.tar.gz -o nginx.tar.gz \
   && curl -fSL http://nginx.org/download/nginx-$NGINX_VERSION.tar.gz.asc -o nginx.tar.gz.asc \
+  && curl -fSL https://github.com/simpl/ngx_devel_kit/archive/v$DEVEL_KIT_MODULE_VERSION.tar.gz -o ndk.tar.gz \
+  && curl -fSL https://github.com/openresty/lua-nginx-module/archive/v$LUA_MODULE_VERSION.tar.gz -o lua.tar.gz \
+  && curl -fSL https://github.com/openresty/set-misc-nginx-module/archive/v$SET_MISC_VERSION.tar.gz -o set.tar.gz \
   && export GNUPGHOME="$(mktemp -d)" \
   && gpg --keyserver hkp://ipv4.pool.sks-keyservers.net:80 --recv-keys "$GPG_KEY" \
   && gpg --batch --verify nginx.tar.gz.asc nginx.tar.gz \
   && rm -r "$GNUPGHOME" nginx.tar.gz.asc \
   && mkdir -p /usr/src \
   && tar -zxC /usr/src -f nginx.tar.gz \
-  && rm nginx.tar.gz \
+  && tar -zxC /usr/src -f ndk.tar.gz \
+  && tar -zxC /usr/src -f lua.tar.gz \
+  && tar -zxC /usr/src -f set.tar.gz \
+  && rm nginx.tar.gz ndk.tar.gz lua.tar.gz set.tar.gz \
   && git clone https://github.com/google/ngx_brotli.git --depth=1 /usr/src/ngx_brotli \
   && cd /usr/src/ngx_brotli \
   && git submodule update --init \
