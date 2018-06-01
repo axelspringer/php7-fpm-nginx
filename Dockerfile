@@ -151,8 +151,9 @@ RUN GPG_KEY=${NGINX_GPG_KEY} \
       | sort -u \
   )" \
   && apk add --no-cache --virtual .nginx-rundeps $runDeps \
-  && git clone --recursive --depth=1 https://github.com/kjdev/php-ext-brotli \
-  && cd php-ext-brotli \
+  && mkdir /usr/src/php-ext-brotli \
+  && cd /usr/src/php-ext-brotli \
+  && git clone --recursive --depth=1 https://github.com/kjdev/php-ext-brotli . \
   && phpize \
   && ./configure \
   && make \
