@@ -156,7 +156,7 @@ RUN GPG_KEY=${NGINX_GPG_KEY} \
   && phpize \
   && ./configure \
   && make \
-  && cp -R modules/brotli.so /usr/lib/php7/modules/brotli.so
+  && cp -R modules/brotli.so /usr/lib/php7/modules/brotli.so \
   && apk del .build-deps \
   && apk del .gettext \
   && mv /tmp/envsubst /usr/local/bin/ \
