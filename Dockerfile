@@ -91,6 +91,7 @@ RUN GPG_KEY=${NGINX_GPG_KEY} \
     gd-dev \
     geoip-dev \
     luajit-dev \
+    php7-dev \
   && curl -fSL http://nginx.org/download/nginx-$NGINX_VERSION.tar.gz -o nginx.tar.gz \
   && curl -fSL http://nginx.org/download/nginx-$NGINX_VERSION.tar.gz.asc -o nginx.tar.gz.asc \
   && curl -fSL https://github.com/simpl/ngx_devel_kit/archive/v$DEVEL_KIT_MODULE_VERSION.tar.gz -o ndk.tar.gz \
@@ -150,6 +151,12 @@ RUN GPG_KEY=${NGINX_GPG_KEY} \
       | sort -u \
   )" \
   && apk add --no-cache --virtual .nginx-rundeps $runDeps \
+  && git clone --recursive --depth=1 https://github.com/kjdev/php-ext-brotli \
+  && cd php-ext-brotli \
+  && phpize \
+  && ./configure \
+  && make \
+  && cp -R modules/brotli.so /usr/lib/php7/modules/brotli.so
   && apk del .build-deps \
   && apk del .gettext \
   && mv /tmp/envsubst /usr/local/bin/ \
