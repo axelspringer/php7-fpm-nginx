@@ -160,6 +160,7 @@ RUN GPG_KEY=${NGINX_GPG_KEY} \
   && cp -R modules/brotli.so /usr/lib/php7/modules/brotli.so \
   && apk del .build-deps \
   && apk del .gettext \
+  && rm -rf /usr/src/ \
   && mv /tmp/envsubst /usr/local/bin/ \
   \
   # forward request and error logs to docker log collector
